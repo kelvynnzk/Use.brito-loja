@@ -12,6 +12,12 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-border: var(--border);
   --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
 
 :root {
@@ -21,6 +27,12 @@
   --primary-foreground: oklch(0.98 0.008 80);
   --border: oklch(0.3 0.015 55 / 16%);
   --ring: oklch(0.49 0.135 32);
+  --sidebar: oklch(0.19 0.016 55);
+  --sidebar-foreground: oklch(0.96 0.014 78);
+  --sidebar-accent: oklch(0.49 0.135 32);
+  --sidebar-accent-foreground: oklch(0.98 0.008 80);
+  --sidebar-border: oklch(0.96 0.014 78 / 12%);
+  --sidebar-ring: oklch(0.49 0.135 32);
   --font-display: "DM Serif Display", Georgia, serif;
   --font-body: "Manrope", Arial, sans-serif;
 }
@@ -65,4 +77,37 @@
 @media (max-width: 767px) {
   .atelier-page::before { left: 1.25rem; }
   .catalog-grid .product-card:nth-child(4n + 2), .catalog-grid .product-card:nth-child(4n + 4) { margin-top: 0; }
+}
+
+/* Direção visual: painel Ateliê de Concreto — superfície mineral, dados legíveis e sinais de cobre. */
+@layer components {
+  .admin-atl { --sidebar: #251d19; --sidebar-foreground: #f7f1e8; --sidebar-accent: #b84c33; --sidebar-accent-foreground: #fffaf3; --sidebar-border: rgba(255,255,255,.12); --sidebar-ring: #b84c33; background-color: #ece6dc; background-image: radial-gradient(rgba(37,29,25,.075) .6px, transparent .75px), linear-gradient(110deg, rgba(255,255,255,.22), transparent 38%); background-size: 11px 11px, 100% 100%; }
+  .admin-kicker { @apply text-[9px] font-bold uppercase tracking-[.16em] text-[#b84c33]; }
+  .admin-panel { @apply border border-[#251d19]/12 bg-[#f4efe7]; box-shadow: 6px 6px 0 rgba(37,29,25,.045); background-image: linear-gradient(90deg, transparent calc(100% - 1px), rgba(37,29,25,.035) calc(100% - 1px)); background-size: 28px 100%; }
+  .admin-button { @apply inline-flex items-center justify-center gap-2 bg-[#b84c33] px-4 py-3 text-[10px] font-bold uppercase tracking-[.13em] text-white transition duration-200 hover:bg-[#923a28] active:scale-[.97]; }
+  .admin-button-ghost { @apply inline-flex items-center justify-center gap-2 border border-[#251d19]/18 bg-transparent px-4 py-3 text-[10px] font-bold uppercase tracking-[.13em] text-[#251d19] transition duration-200 hover:border-[#b84c33] hover:text-[#b84c33] active:scale-[.97]; }
+  .admin-input { @apply mt-2 h-11 w-full border border-[#251d19]/18 bg-white/50 px-3 text-sm outline-none transition-colors focus:border-[#b84c33]; }
+  .admin-field-label { @apply text-[10px] font-bold uppercase tracking-[.13em] text-[#251d19]/60; }
+  .admin-search { @apply flex h-10 items-center gap-2 border border-[#251d19]/15 bg-white/50 px-3 text-[#251d19]/55; }
+  .admin-search input { @apply w-40 bg-transparent text-sm text-[#251d19] outline-none placeholder:text-[#251d19]/40 sm:w-52; }
+  .admin-table-action { @apply inline-flex items-center gap-1 border-b border-transparent pb-0.5 text-[10px] font-bold uppercase tracking-[.12em] text-[#251d19]/60 transition-colors hover:border-[#b84c33] hover:text-[#b84c33]; }
+  .admin-hero { box-shadow: 7px 7px 0 rgba(184,76,51,.09); background-image: linear-gradient(90deg, rgba(184,76,51,.07) 1px, transparent 1px), linear-gradient(180deg, transparent 84%, rgba(37,29,25,.07) 84%); background-size: 82px 100%, 100% 16px; }
+  .metric-card { min-height: 175px; box-shadow: 4px 4px 0 rgba(37,29,25,.04); background-image: linear-gradient(135deg, transparent 0 92%, rgba(184,76,51,.16) 92% 100%); }
+  .metric-index { position: absolute; right: 1.25rem; top: 1.15rem; font-size: 8px; font-weight: 800; letter-spacing: .13em; color: rgba(37,29,25,.38); }
+  .metric-copper { background: #f4efe7; }
+  .metric-dark { background: #e5d8c9; }
+  .metric-sand { background: #f1e8de; }
+  .metric-clay { background: #ead7cd; }
+  .metric-lead { min-height: 205px; border-left: 3px solid #b84c33; }
+  .metric-lead::after { content: "SINAL / ATELIÊ"; position: absolute; bottom: 1.15rem; right: 1.25rem; font-size: 8px; font-weight: 800; letter-spacing: .14em; color: rgba(184,76,51,.66); }
+  .metric-wide { background-color: #ead7cd; }
+  .admin-view-header { @apply flex flex-col gap-5 border-b border-[#251d19]/12 pb-6 lg:flex-row lg:items-end lg:justify-between; }
+  .admin-counter { @apply flex items-end gap-3 border-l-2 border-[#b84c33] pl-4; }
+  .admin-counter span { font-family: var(--font-display); font-size: 3rem; line-height: .8; }
+  .admin-counter p { @apply max-w-20 text-[10px] font-bold uppercase tracking-[.12em] text-[#251d19]/55; }
+  .campaign-card { box-shadow: 8px 8px 0 rgba(184,76,51,.08); }
+}
+
+@media (min-width: 1280px) {
+  .metric-lead, .metric-wide { grid-column: span 2; }
 }

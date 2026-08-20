@@ -65,3 +65,9 @@ O wordmark preserva **Use.Brito** em uma combinação de serif refinada e ponto 
 - Cada página deve apresentar ao menos um dispositivo editorial de ateliê: coordenada tipográfica, régua, bloco mineral, moldura deslocada ou o símbolo de arcos interligados.
 - Imagens de coleção e produto precisam permanecer no mesmo universo: concreto, gesso, linho, tons de terra, textura têxtil e calor urbano brasileiro.
 - A vitrine de produto usa ritmo de lookbook, com agrupamentos, alturas e molduras discretamente deslocadas, mantendo preço e ação de compra imediatamente legíveis.
+
+### Admin Use.Brito
+
+- A área administrativa é uma mesa de curadoria editorial: clareza operacional acompanhada por ao menos uma régua tipográfica, selo de Cobre de Barro, marca d’água dos arcos ou moldura de prova em cada visão.
+- Métricas e dados devem ganhar hierarquia por escala editorial, agrupamentos assimétricos e materialidade mineral — nunca como cartões SaaS neutros.
+- Elementos de catálogo, estoque e campanha carregam o universo de moda por meio de recortes de campanha, textura têxtil, tons terrosos e molduras editoriais, mesmo quando funcionais.

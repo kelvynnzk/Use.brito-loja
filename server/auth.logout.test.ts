@@ -3,13 +3,19 @@ import { appRouter } from "./routers";
 import { COOKIE_NAME } from "../shared/const";
 import type { TrpcContext } from "./_core/context";
 
+/** Registro de uma limpeza de cookie capturada pela resposta HTTP simulada. */
 type CookieCall = {
   name: string;
   options: Record<string, unknown>;
 };
 
+/** Atalho para garantir que o contexto de teste sempre tenha um usuário autenticado completo. */
 type AuthenticatedUser = NonNullable<TrpcContext["user"]>;
 
+/**
+ * Cria um contexto tRPC isolado para validar logout sem abrir uma sessão real.
+ * A função clearCookie é simulada para permitir inspeção dos atributos de segurança enviados.
+ */
 function createAuthContext(): { ctx: TrpcContext; clearedCookies: CookieCall[] } {
   const clearedCookies: CookieCall[] = [];
 
@@ -41,6 +47,7 @@ function createAuthContext(): { ctx: TrpcContext; clearedCookies: CookieCall[] }
   return { ctx, clearedCookies };
 }
 
+/** Confirma que o logout encerra a sessão no navegador com as mesmas garantias de segurança da produção. */
 describe("auth.logout", () => {
   it("clears the session cookie and reports success", async () => {
     const { ctx, clearedCookies } = createAuthContext();

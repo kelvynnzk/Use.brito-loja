@@ -15,6 +15,11 @@ import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import ProductDetail from "./pages/ProductDetail";
 import Admin from "./pages/Admin";
+
+/**
+ * Separa o painel protegido da casca visual pública.
+ * A antiga rota de checkout continua apontando para a sacola para não criar uma página de pagamento.
+ */
 function Router() {
   const [isAdmin] = useRoute("/admin");
   if (isAdmin) return <Admin />;
@@ -35,6 +40,7 @@ function Router() {
   );
 }
 
+/** Fornece contexto de sacola, notificações e captura de erros para toda a experiência da loja. */
 function App() {
   return (
     <ErrorBoundary>

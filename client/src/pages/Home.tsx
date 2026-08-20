@@ -9,7 +9,9 @@ import { categories } from "@/data/products";
 import { trpc } from "@/lib/trpc";
 
 export default function Home() {
+  // A mesma fonte persistente abastece a vitrine inicial e a página completa de catálogo.
   const catalogQuery = trpc.catalog.list.useQuery();
+  // A home mostra somente os quatro primeiros registros publicados, preservando a curadoria visual.
   const featuredProducts = catalogQuery.data?.slice(0, 4) ?? [];
 
   return (
@@ -85,6 +87,7 @@ export default function Home() {
             <Link href="/catalogo" className="hidden text-xs font-bold uppercase tracking-[0.14em] underline underline-offset-4 md:block">Ver todas</Link>
           </div>
           <div className="catalog-grid grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4 md:gap-x-6 md:gap-y-12">
+            {/* Mantém a estrutura editorial estável enquanto os destaques são buscados no servidor. */}
             {catalogQuery.isLoading && Array.from({ length: 4 }).map((_, index) => <div key={index} className="aspect-[4/5] animate-pulse bg-[#dfd2c4]" />)}
             {featuredProducts.map((product, index) => <ProductCard product={product} key={product.id} priority={index < 2} />)}
           </div>

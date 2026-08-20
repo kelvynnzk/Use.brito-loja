@@ -3,9 +3,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Home } from "lucide-react";
 import { useLocation } from "wouter";
 
+/** Página de contingência exibida quando a URL não corresponde a nenhuma rota da aplicação. */
 export default function NotFound() {
   const [, setLocation] = useLocation();
 
+  /** Redireciona a pessoa para a vitrine inicial sem depender do histórico do navegador. */
   const handleGoHome = () => {
     setLocation("/");
   };

@@ -10,15 +10,18 @@ import { categories, categoryLabels, type Category } from "@/data/products";
 import { trpc } from "@/lib/trpc";
 
 export default function Catalog() {
+  // Os parâmetros da URL permitem chegar ao catálogo já filtrado a partir de links e da busca global.
   const params = new URLSearchParams(window.location.search);
   const initialCategory = params.get("categoria") as Category | null;
   const initialSearch = params.get("busca") || "";
   const [category, setCategory] = useState<Category | "todas">(initialCategory && categoryLabels[initialCategory] ? initialCategory : "todas");
   const [search, setSearch] = useState(initialSearch);
   const [sort, setSort] = useState("destaque");
+  // Consulta pública que traz somente as peças publicadas e persistidas no banco.
   const catalogQuery = trpc.catalog.list.useQuery();
   const products = catalogQuery.data ?? [];
 
+  /** Aplica categoria, termo de busca e ordenação no catálogo recebido, sem duplicar chamadas ao servidor. */
   const filtered = useMemo(() => {
     const needle = search.trim().toLocaleLowerCase("pt-BR");
     const selection = products.filter((product) => {
@@ -31,6 +34,7 @@ export default function Catalog() {
     return selection;
   }, [category, products, search, sort]);
 
+  /** Restaura a navegação à curadoria completa depois de uma busca ou filtro. */
   const reset = () => { setCategory("todas"); setSearch(""); setSort("destaque"); };
 
   return (
@@ -75,6 +79,7 @@ export default function Catalog() {
           </section>
         )}
         <p className="mb-7 text-[10px] font-bold uppercase tracking-[0.16em] text-[#241c18]/55">{catalogQuery.isLoading ? "Carregando curadoria" : `${filtered.length} ${filtered.length === 1 ? "peça encontrada" : "peças encontradas"}`}</p>
+        {/* Esqueleto visual mantém a grade estável enquanto os registros persistentes são carregados. */}
         {catalogQuery.isLoading && <div className="catalog-grid grid grid-cols-2 gap-x-4 gap-y-11 md:grid-cols-4 md:gap-x-6 md:gap-y-14">{Array.from({ length: 8 }).map((_, index) => <div key={index} className="aspect-[4/5] animate-pulse bg-[#dfd2c4]" />)}</div>}
         {!catalogQuery.isLoading && filtered.length > 0 ? (
           <div className="catalog-grid grid grid-cols-2 gap-x-4 gap-y-11 md:grid-cols-4 md:gap-x-6 md:gap-y-14">

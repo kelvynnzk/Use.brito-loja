@@ -7,6 +7,7 @@ import { Menu, Search, ShoppingBag, X } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 
+// Fonte única dos links de navegação usados nas versões desktop e mobile do cabeçalho.
 const navItems = [
   { label: "Novidades", href: "/catalogo" },
   { label: "Vestidos", href: "/catalogo?categoria=vestidos" },
@@ -15,6 +16,10 @@ const navItems = [
   { label: "Contato", href: "/contato" },
 ];
 
+/**
+ * Casca da loja pública: reúne aviso superior, navegação, busca, contador da sacola e rodapé.
+ * As páginas internas entram por meio de children sem precisar repetir esses elementos.
+ */
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -22,6 +27,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const [query, setQuery] = useState("");
   const { count } = useCart();
 
+  /** Converte a busca editorial em parâmetro de URL para o filtro ser aplicado pelo catálogo. */
   const submitSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const value = query.trim();
@@ -72,6 +78,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
         </div>
+        {/* O menu mobile só existe no DOM quando aberto, mantendo o foco da navegação enxuto. */}
         {menuOpen && (
           <div className="border-t border-[#241c18]/10 bg-[#f4efe7] px-5 py-5 md:hidden">
             <nav className="flex flex-col divide-y divide-[#241c18]/10" aria-label="Menu mobile">
@@ -85,6 +92,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         )}
       </header>
 
+      {/* Modal de busca com termos rápidos para encurtar o caminho até a curadoria. */}
       {searchOpen && (
         <div className="fixed inset-0 z-50 bg-[#241c18]/45 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Buscar produtos">
           <div className="mx-auto mt-[11vh] max-w-2xl border border-[#241c18]/15 bg-[#f4efe7] p-6 shadow-2xl sm:p-9">

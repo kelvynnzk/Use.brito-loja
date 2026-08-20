@@ -6,6 +6,7 @@ import { getDb } from "./db";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
 
+/** Garante que a mensagem recebida pelo ateliê carregue referência, itens, tamanhos e subtotal. */
 describe("buildCatalogWhatsAppMessage", () => {
   it("includes the reference, each selected item and the correct subtotal", () => {
     const message = buildCatalogWhatsAppMessage({
@@ -24,6 +25,7 @@ describe("buildCatalogWhatsAppMessage", () => {
   });
 });
 
+/** Verifica a sanitização do telefone e a codificação segura do texto na URL wa.me. */
 describe("buildWhatsAppUrl", () => {
   it("normalizes the destination number and URL-encodes the generated message", () => {
     expect(buildWhatsAppUrl("55 (21) 96591-7831", "Olá, Use.Brito!\nVestido Aurora")).toBe(
@@ -32,12 +34,17 @@ describe("buildWhatsAppUrl", () => {
   });
 });
 
+/**
+ * Teste de integração do painel protegido.
+ * O registro temporário é removido no finally para não permanecer no catálogo real após a validação.
+ */
 describe("admin catalog persistence", () => {
   it("persists an authorized product update and cleans up the controlled record", async () => {
     const db = await getDb();
     if (!db) throw new Error("Banco de dados indisponível para o teste de integração.");
 
     const slug = `teste-integracao-${Date.now()}`;
+    // Contexto controlado com papel admin para executar a mesma mutação usada pela interface.
     const ctx: TrpcContext = {
       user: {
         id: 1,

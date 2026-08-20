@@ -1,7 +1,8 @@
 import { int, json, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 /**
- * Contas autenticadas pelo Manus OAuth. O proprietário do projeto é promovido a admin no upsert.
+ * Contas autenticadas pelo Manus OAuth.
+ * O proprietário do projeto recebe o papel de administrador durante o upsert realizado pelo servidor.
  */
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
@@ -15,7 +16,10 @@ export const users = mysqlTable("users", {
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
 });
 
-/** Catálogo público. Valores monetários usam centavos para evitar erros de ponto flutuante. */
+/**
+ * Catálogo público exibido na vitrine.
+ * Os valores monetários ficam em centavos para evitar imprecisões de ponto flutuante em cálculos e snapshots.
+ */
 export const catalogProducts = mysqlTable("catalog_products", {
   id: int("id").autoincrement().primaryKey(),
   slug: varchar("slug", { length: 180 }).notNull().unique(),
@@ -35,7 +39,10 @@ export const catalogProducts = mysqlTable("catalog_products", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
-/** Registro do interesse enviado para o WhatsApp; o atendimento acontece fora do site. */
+/**
+ * Registro de uma seleção enviada para atendimento via WhatsApp.
+ * O pedido comercial é conduzido fora do site, mas a intenção e a mensagem são preservadas no banco.
+ */
 export const catalogRequests = mysqlTable("catalog_requests", {
   id: int("id").autoincrement().primaryKey(),
   reference: varchar("reference", { length: 32 }).notNull().unique(),
@@ -47,7 +54,10 @@ export const catalogRequests = mysqlTable("catalog_requests", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
-/** Snapshot das peças selecionadas em cada solicitação, preservando preço e nome da data do contato. */
+/**
+ * Snapshot das peças de cada solicitação.
+ * Nome, imagem e preço unitário são copiados para manter o histórico mesmo se o catálogo mudar depois.
+ */
 export const catalogRequestItems = mysqlTable("catalog_request_items", {
   id: int("id").autoincrement().primaryKey(),
   requestReference: varchar("requestReference", { length: 32 }).notNull(),
@@ -59,7 +69,7 @@ export const catalogRequestItems = mysqlTable("catalog_request_items", {
   unitPriceCents: int("unitPriceCents").notNull(),
 });
 
-/** Configurações operacionais persistidas para a vitrine. */
+/** Configurações operacionais persistidas, como o número de atendimento do WhatsApp. */
 export const storeSettings = mysqlTable("store_settings", {
   settingKey: varchar("settingKey", { length: 80 }).primaryKey(),
   settingValue: text("settingValue").notNull(),

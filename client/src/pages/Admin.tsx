@@ -52,6 +52,7 @@ import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { startLogin } from "@/const";
 
+// Visões internas disponíveis no painel; a navegação troca o conteúdo sem sair da rota administrativa.
 type AdminView = "visao" | "pedidos" | "catalogo";
 type AdminProduct = Product & { stock: number; state: "Publicado" | "Rascunho" };
 type OrderStatus = "Em análise" | "Contato iniciado" | "Concluído";
@@ -63,6 +64,7 @@ const navItems: { id: AdminView; label: string; icon: typeof LayoutDashboard }[]
   { id: "catalogo", label: "Catálogo", icon: ShoppingBag },
 ];
 
+// Cores semânticas aplicadas aos estados persistidos de atendimento.
 const statusClasses: Record<OrderStatus, string> = {
   "Em análise": "bg-[#f2d8ce] text-[#8f3f2c]",
   "Contato iniciado": "bg-[#f2e8bc] text-[#6d5414]",
@@ -71,16 +73,20 @@ const statusClasses: Record<OrderStatus, string> = {
 
 export default function Admin() {
   const [, setLocation] = useLocation();
+  // A autenticação define se a pessoa pode consultar e alterar os dados operacionais.
   const { user, loading: authLoading } = useAuth();
   const canManage = user?.role === "admin";
   const utils = trpc.useUtils();
+  // Consultas só são disparadas depois que a permissão administrativa é confirmada.
   const catalogQuery = trpc.admin.products.useQuery(undefined, { enabled: canManage });
   const requestsQuery = trpc.admin.requests.useQuery(undefined, { enabled: canManage });
+  // Após uma mutação bem-sucedida, o cache correspondente é invalidado para atualizar a interface.
   const createProductMutation = trpc.admin.createProduct.useMutation({ onSuccess: () => utils.admin.products.invalidate() });
   const updateProductMutation = trpc.admin.updateProduct.useMutation({ onSuccess: () => utils.admin.products.invalidate() });
   const updateRequestMutation = trpc.admin.updateRequestStatus.useMutation({ onSuccess: () => utils.admin.requests.invalidate() });
   const [activeView, setActiveView] = useState<AdminView>("visao");
   const catalog: AdminProduct[] = catalogQuery.data ?? [];
+  // A tabela do painel recebe rótulos legíveis em pt-BR a partir dos estados técnicos do banco.
   const orders: AdminOrder[] = (requestsQuery.data ?? []).map((request) => ({
       id: `#${request.reference}`,
       customer: "Solicitação via WhatsApp",
@@ -98,12 +104,14 @@ export default function Admin() {
 
   const published = catalog.filter((product) => product.state === "Publicado").length;
   const lowStock = catalog.filter((product) => product.stock < 6).length;
+  /** Filtra apenas a lista já autorizada e carregada, sem gerar nova consulta a cada busca. */
   const filteredCatalog = useMemo(() => {
     const needle = search.trim().toLocaleLowerCase("pt-BR");
     if (!needle) return catalog;
     return catalog.filter((product) => `${product.name} ${categoryLabels[product.category]}`.toLocaleLowerCase("pt-BR").includes(needle));
   }, [catalog, search]);
 
+  /** Preenche o formulário para criação ou edição conforme a peça selecionada. */
   const openProductDialog = (product?: AdminProduct) => {
     setEditing(product ?? null);
     setFormName(product?.name ?? "");
@@ -112,6 +120,7 @@ export default function Admin() {
     setDialogOpen(true);
   };
 
+  /** Salva um rascunho novo ou uma atualização parcial no catálogo persistente. */
   const saveProduct = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!formName.trim() || !formPrice) return;
@@ -142,6 +151,7 @@ export default function Admin() {
     setDialogOpen(false);
   };
 
+  /** Alterna entre rascunho e publicação, mantendo a vitrine pública sincronizada. */
   const toggleProductState = (id: number) => {
     if (!canManage) {
       startLogin();
@@ -152,6 +162,7 @@ export default function Admin() {
     updateProductMutation.mutate({ id, product: { state: product.state === "Publicado" ? "Rascunho" : "Publicado" } }, { onSuccess: () => toast.success("Status da peça atualizado no catálogo.") });
   };
 
+  /** Avança ciclicamente a conversa: análise, contato iniciado e concluída. */
   const changeOrderStatus = (id: string) => {
     if (!canManage) {
       startLogin();
@@ -163,6 +174,7 @@ export default function Admin() {
     updateRequestMutation.mutate({ reference: id.replace(/^#/, ""), status: next }, { onSuccess: () => toast.success("Solicitação atualizada.") });
   };
 
+  // Estados de acesso impedem que o painel exiba dados operacionais antes da autenticação.
   if (authLoading) {
     return <div className="grid min-h-screen place-items-center bg-[#ece6dc] p-6 text-center text-[#251d19]"><div><p className="admin-kicker">Ateliê admin</p><p className="display-font mt-3 text-4xl">Preparando o bastidor.</p></div></div>;
   }

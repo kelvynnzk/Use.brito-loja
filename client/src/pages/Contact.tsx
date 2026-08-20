@@ -7,6 +7,10 @@ import { ArrowUpRight, Instagram, MessageCircle, Send } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Contact() {
+  /**
+   * Mantém uma resposta visual imediata para o formulário institucional.
+   * O envio de e-mail não foi conectado nesta versão e, por isso, nenhum dado é persistido aqui.
+   */
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     event.currentTarget.reset();
@@ -19,6 +23,7 @@ export default function Contact() {
   );
 }
 
+/** Campo reutilizável para manter rótulos, acessibilidade e estilo do formulário consistentes. */
 function ContactField({ label, name, className = "", type = "text", required = false }: { label: string; name: string; className?: string; type?: string; required?: boolean }) {
   return <label className={className}><span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.14em] text-[#241c18]/60">{label}</span><input name={name} type={type} required={required} className="h-12 w-full border border-[#241c18]/20 bg-transparent px-3 text-sm outline-none focus:border-[#b84c33]" /></label>;
 }

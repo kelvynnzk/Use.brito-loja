@@ -14,7 +14,9 @@ import {
   updateCatalogProduct,
 } from "./db";
 
+// Categorias técnicas compartilhadas entre a validação do servidor e a vitrine.
 const categorySchema = z.enum(["vestidos", "alfaiataria", "tricos", "essenciais", "acessorios"]);
+// Contrato de entrada usado para criar peças e validar atualizações no painel administrativo.
 const productInput = z.object({
   slug: z.string().min(3).max(180),
   name: z.string().min(2).max(180),
@@ -31,6 +33,7 @@ const productInput = z.object({
   sortOrder: z.number().int().min(0).default(0),
 });
 
+/** Traduz campos da interface para nomes e unidades utilizadas no banco de dados. */
 const toDbProduct = (input: z.infer<typeof productInput>) => ({
   slug: input.slug,
   name: input.name,
@@ -47,8 +50,13 @@ const toDbProduct = (input: z.infer<typeof productInput>) => ({
   sortOrder: input.sortOrder,
 });
 
+/**
+ * Agrupa as APIs tRPC da aplicação.
+ * Rotas de catálogo são públicas; alterações de produtos e solicitações exigem perfil admin.
+ */
 export const appRouter = router({
   system: systemRouter,
+  // Sessão usada pelo painel administrativo e pelos controles de permissão.
   auth: router({
     me: publicProcedure.query((opts) => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -57,17 +65,20 @@ export const appRouter = router({
       return { success: true } as const;
     }),
   }),
+  // Rotas usadas pela loja pública, pela sacola e pelo atendimento no WhatsApp.
   catalog: router({
     list: publicProcedure.query(() => listPublicCatalog()),
     whatsapp: publicProcedure.query(async () => ({ phone: await getWhatsAppPhone() })),
     request: publicProcedure.input(z.object({ items: z.array(z.object({ productId: z.number().int().positive(), size: z.string().min(1).max(16), quantity: z.number().int().min(1).max(20) })).min(1).max(20) })).mutation(({ input }) => createCatalogRequest(input)),
   }),
+  // Rotas protegidas: apenas a conta administradora pode alterar dados persistentes.
   admin: router({
     products: adminProcedure.query(() => listAdminCatalog()),
     requests: adminProcedure.query(() => listCatalogRequests()),
     updateRequestStatus: adminProcedure.input(z.object({ reference: z.string().min(3), status: z.enum(["new", "contacted", "archived"]) })).mutation(({ input }) => updateCatalogRequestStatus(input.reference, input.status)),
     createProduct: adminProcedure.input(productInput).mutation(({ input }) => createCatalogProduct(toDbProduct(input))),
     updateProduct: adminProcedure.input(z.object({ id: z.number().int().positive(), product: productInput.partial() })).mutation(async ({ input }) => {
+      // Campos ausentes não devem sobrescrever dados existentes com valores vazios.
       const updates = input.product;
       const dbUpdates = {
         ...(updates.slug !== undefined ? { slug: updates.slug } : {}),

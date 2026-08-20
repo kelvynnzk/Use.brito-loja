@@ -5,6 +5,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Expõe variáveis semânticas para componentes Tailwind e mantém cores de interface consistentes. */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -20,6 +21,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* Tokens-base da marca: fundo mineral, tipografia editorial e acento Cobre de Barro. */
 :root {
   --background: oklch(0.956 0.014 78);
   --foreground: oklch(0.19 0.016 55);
@@ -37,6 +39,7 @@
   --font-body: "Manrope", Arial, sans-serif;
 }
 
+/* Regras globais de contraste, foco visível e comportamento de interação. */
 @layer base {
   * { @apply border-border; }
   html { scroll-behavior: smooth; }
@@ -46,6 +49,7 @@
   button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid #b84c33; outline-offset: 3px; }
 }
 
+/* Componentes utilitários reutilizados na vitrine pública. */
 @layer components {
   .display-font { font-family: var(--font-display); }
   .eyebrow { @apply text-[10px] font-bold uppercase tracking-[0.18em] text-[#b84c33]; }
@@ -69,17 +73,20 @@
   .empty-atelier-state::before { content: ""; display: block; height: 4px; background: #b84c33; }
 }
 
+/* Animações são aplicadas apenas a pessoas que não sinalizaram redução de movimento. */
 @media (prefers-reduced-motion: no-preference) {
   .product-card { animation: product-enter .48s cubic-bezier(.23,1,.32,1) both; }
   @keyframes product-enter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 }
 
+/* Em telas menores, o recorte assimétrico da grade volta a uma leitura linear. */
 @media (max-width: 767px) {
   .atelier-page::before { left: 1.25rem; }
   .catalog-grid .product-card:nth-child(4n + 2), .catalog-grid .product-card:nth-child(4n + 4) { margin-top: 0; }
 }
 
 /* Direção visual: painel Ateliê de Concreto — superfície mineral, dados legíveis e sinais de cobre. */
+/* Utilitários exclusivos do painel: dados persistentes com a mesma materialidade editorial da vitrine. */
 @layer components {
   .admin-atl { --sidebar: #251d19; --sidebar-foreground: #f7f1e8; --sidebar-accent: #b84c33; --sidebar-accent-foreground: #fffaf3; --sidebar-border: rgba(255,255,255,.12); --sidebar-ring: #b84c33; background-color: #ece6dc; background-image: radial-gradient(rgba(37,29,25,.075) .6px, transparent .75px), linear-gradient(110deg, rgba(255,255,255,.22), transparent 38%); background-size: 11px 11px, 100% 100%; }
   .admin-kicker { @apply text-[9px] font-bold uppercase tracking-[.16em] text-[#b84c33]; }

@@ -2,21 +2,28 @@ import { cn } from "@/lib/utils";
 import { AlertTriangle, RotateCcw } from "lucide-react";
 import { Component, ReactNode } from "react";
 
+/** Propriedades aceitas pelo contêiner que protege a árvore principal da aplicação. */
 interface Props {
   children: ReactNode;
 }
 
+/** Estado interno que registra uma falha capturada durante a renderização. */
 interface State {
   hasError: boolean;
   error: Error | null;
 }
 
+/**
+ * Intercepta erros de renderização dos filhos e substitui a tela quebrada por uma ação de recarregamento.
+ * Isso evita que uma exceção de interface deixe a loja sem uma rota de recuperação visível.
+ */
 class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = { hasError: false, error: null };
   }
 
+  /** Atualiza o estado de fallback assim que o React captura um erro descendente. */
   static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }

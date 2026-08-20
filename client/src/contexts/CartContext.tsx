@@ -5,6 +5,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Product } from "@/data/products";
 
+/** Representa uma combinação única de peça, tamanho escolhido e quantidade na sacola. */
 export type CartItem = { product: Product; size: string; quantity: number };
 
 type CartContextValue = {
@@ -17,12 +18,16 @@ type CartContextValue = {
   clearCart: () => void;
 };
 
+// Contexto compartilhado para a seleção enquanto a pessoa navega pela vitrine.
 const CartContext = createContext<CartContextValue | null>(null);
+// Chave de armazenamento local; a sacola persiste no dispositivo até ser enviada ou limpa.
 const CART_KEY = "use-brito-cart";
 
+/** Disponibiliza a sacola para a loja e sincroniza suas escolhas com localStorage. */
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
 
+  // Recupera uma seleção deixada em uma visita anterior, descartando dados corrompidos.
   useEffect(() => {
     const saved = window.localStorage.getItem(CART_KEY);
     if (saved) {
@@ -34,6 +39,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Mantém o armazenamento local alinhado após cada inclusão, remoção ou ajuste de quantidade.
   useEffect(() => {
     window.localStorage.setItem(CART_KEY, JSON.stringify(items));
   }, [items]);
@@ -42,6 +48,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     items,
     count: items.reduce((sum, item) => sum + item.quantity, 0),
     subtotal: items.reduce((sum, item) => sum + item.product.price * item.quantity, 0),
+    // Itens iguais são agrupados pelo par produto + tamanho, sem duplicar a linha da seleção.
     addItem: (product, size) => {
       setItems((current) => {
         const existing = current.find((item) => item.product.id === product.id && item.size === size);
@@ -55,6 +62,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return [...current, { product, size, quantity: 1 }];
       });
     },
+    // Quantidade zero é interpretada como remoção da peça da sacola.
     updateQuantity: (productId, size, quantity) => {
       if (quantity <= 0) {
         setItems((current) => current.filter((item) => !(item.product.id === productId && item.size === size)));
@@ -75,6 +83,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
+/** Hook de acesso seguro à sacola; só pode ser usado dentro de CartProvider. */
 export function useCart() {
   const context = useContext(CartContext);
   if (!context) throw new Error("useCart deve ser usado dentro de CartProvider");

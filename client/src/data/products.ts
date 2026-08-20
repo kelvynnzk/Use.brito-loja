@@ -2,8 +2,10 @@
  * Direção visual: Ateliê de Concreto — dados de produto sustentam uma curadoria urbana,
  * tátil e editorial, com paleta mineral e linguagem de boutique brasileira.
  */
+/** Categorias técnicas aceitas no banco, nos filtros e nos links de curadoria. */
 export type Category = "vestidos" | "alfaiataria" | "tricos" | "essenciais" | "acessorios";
 
+/** Formato de exibição de uma peça na vitrine e na sacola. */
 export type Product = {
   id: number;
   slug: string;
@@ -18,6 +20,7 @@ export type Product = {
   sizes: string[];
 };
 
+/** Rótulos em pt-BR usados para transformar categorias técnicas em texto visível. */
 export const categoryLabels: Record<Category, string> = {
   vestidos: "Vestidos",
   alfaiataria: "Alfaiataria",
@@ -26,6 +29,10 @@ export const categoryLabels: Record<Category, string> = {
   acessorios: "Acessórios",
 };
 
+/**
+ * Referência visual local das peças originais do projeto.
+ * A loja pública consulta o banco; esta lista mantém os tipos e o conteúdo-base da curadoria no código.
+ */
 export const products: Product[] = [
   {
     id: 1,
@@ -129,6 +136,7 @@ export const products: Product[] = [
   },
 ];
 
+/** Coleções editoriais apresentadas na home e usadas como atalhos de navegação para o catálogo. */
 export const categories = [
   {
     name: "Vestidos",
@@ -150,5 +158,6 @@ export const categories = [
   },
 ];
 
+/** Formata valores em reais para todos os pontos de exibição da interface. */
 export const formatBRL = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);

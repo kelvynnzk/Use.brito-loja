@@ -14,3 +14,11 @@
 - [x] Substituir o checkout por carrinho de seleção e mensagem de WhatsApp.
 - [x] Validar gravação, leitura, atualização e o direcionamento ao WhatsApp.
 - [x] Salvar o checkpoint da integração com banco de dados.
+
+## Documentação do código
+
+- [x] Mapear o código-fonte mantido da loja, do painel e da persistência.
+- [x] Comentar em pt-BR os modelos, serviços, rotas e testes de servidor.
+- [x] Comentar em pt-BR os componentes, páginas, contextos e estilos mantidos da interface.
+- [x] Validar a compilação após a documentação.
+- [x] Salvar o checkpoint da documentação em pt-BR.

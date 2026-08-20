@@ -14,6 +14,10 @@ export default function Cart() {
   const { items, subtotal, removeItem, updateQuantity, clearCart } = useCart();
   const requestMutation = trpc.catalog.request.useMutation();
 
+  /**
+   * Persiste a seleção antes de abrir o WhatsApp.
+   * Ao obter sucesso, a sacola local é limpa e a conversa recebe uma mensagem já estruturada pelo servidor.
+   */
   const openWhatsApp = async () => {
     try {
       const result = await requestMutation.mutateAsync({ items: items.map((item) => ({ productId: item.product.id, size: item.size, quantity: item.quantity })) });
@@ -24,6 +28,7 @@ export default function Cart() {
     }
   };
 
+  // A sacola vazia conduz a pessoa de volta ao catálogo, sem expor etapas de pagamento.
   if (!items.length) {
     return <div className="atelier-page bg-[#f4efe7] px-5 py-24 md:px-10 md:py-32"><span className="atelier-coordinate right-5 top-8 md:right-10">04 / SACOLA</span><div className="empty-atelier-state mx-auto max-w-3xl overflow-hidden border border-[#241c18]/15 bg-[#ede4da] md:grid md:grid-cols-[.6fr_1fr]"><div className="relative min-h-48 bg-[#241c18] p-7 text-[#f4efe7]"><img src="/manus-storage/use-brito-mark_b2bb36b9.png" alt="" className="h-12 w-12 brightness-0 invert" /><span className="atelier-coordinate bottom-6 left-7 text-white/55">SACOLA / VAZIA</span></div><div className="p-7 md:p-10"><p className="eyebrow">Sua sacola</p><h1 className="display-font mt-4 text-5xl tracking-[-0.04em] md:text-6xl">Ela está pronta para ganhar forma.</h1><p className="mt-5 max-w-sm text-sm leading-6 text-[#241c18]/65">Encontre uma peça que acompanhe o seu ritmo e volte aqui para concluir a escolha.</p><Link href="/catalogo" className="btn-dark mt-9">Explorar a curadoria <ArrowRight size={16} /></Link></div></div></div>;
   }

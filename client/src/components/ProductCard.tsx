@@ -9,9 +9,14 @@ import type { Product } from "@/data/products";
 import { formatBRL } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 
+/**
+ * Apresenta uma peça em grids de vitrine e oferece dois caminhos: abrir o detalhe ou adicioná-la rapidamente.
+ * A opção priority permite carregar com prioridade as imagens que aparecem antes da dobra da página.
+ */
 export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
   const { addItem } = useCart();
 
+  /** Usa o primeiro tamanho disponível para agilizar a seleção sem impedir ajuste posterior no detalhe. */
   const quickAdd = () => {
     addItem(product, product.sizes[0]);
     toast.success(`${product.name} foi para a sua sacola.`, { description: `Tamanho ${product.sizes[0]} selecionado.` });

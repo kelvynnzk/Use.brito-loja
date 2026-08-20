@@ -14,10 +14,14 @@ import { initialCatalogSeed } from "./catalogSeed";
 import { buildCatalogWhatsAppMessage, type WhatsAppCatalogItem } from "../shared/catalogMessage";
 import { ENV } from "./_core/env";
 
+// A conexão é criada sob demanda para que scripts de análise não precisem abrir o banco.
 let _db: ReturnType<typeof drizzle> | null = null;
+// Chave estável usada para salvar e recuperar o destino do atendimento no banco.
 const WHATSAPP_SETTING_KEY = "whatsappPhone";
+// Valor inicial utilizado somente no primeiro bootstrap da loja.
 const DEFAULT_WHATSAPP_PHONE = "5521965917831";
 
+/** Retorna a instância Drizzle já conectada, quando DATABASE_URL está disponível. */
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
@@ -30,6 +34,10 @@ export async function getDb() {
   return _db;
 }
 
+/**
+ * Cria ou atualiza a conta autenticada sem perder campos de perfil já existentes.
+ * O dono do projeto é promovido automaticamente para o papel de administrador.
+ */
 export async function upsertUser(user: InsertUser): Promise<void> {
   if (!user.openId) throw new Error("User openId is required for upsert");
   const db = await getDb();
@@ -47,6 +55,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   await db.insert(users).values(values).onDuplicateKeyUpdate({ set: updateSet });
 }
 
+/** Localiza uma pessoa autenticada a partir do identificador retornado pelo OAuth. */
 export async function getUserByOpenId(openId: string) {
   const db = await getDb();
   if (!db) return undefined;
@@ -54,6 +63,10 @@ export async function getUserByOpenId(openId: string) {
   return result[0];
 }
 
+/**
+ * Garante que a primeira abertura da loja tenha catálogo e configuração de atendimento.
+ * O insert é idempotente para suportar mais de um acesso inicial simultâneo sem duplicar registros.
+ */
 async function ensureStoreBootstrap() {
   const db = await getDb();
   if (!db) throw new Error("Banco de dados indisponível.");
@@ -67,6 +80,10 @@ async function ensureStoreBootstrap() {
   return db;
 }
 
+/**
+ * Converte o formato interno do banco para o formato usado pela interface.
+ * Preços voltam de centavos para reais e estados técnicos recebem rótulos em pt-BR.
+ */
 export function mapCatalogProduct(product: CatalogProduct) {
   return {
     id: product.id,
@@ -86,18 +103,21 @@ export function mapCatalogProduct(product: CatalogProduct) {
   };
 }
 
+/** Lista apenas peças publicadas, ordenadas para a vitrine pública. */
 export async function listPublicCatalog() {
   const db = await ensureStoreBootstrap();
   const rows = await db.select().from(catalogProducts).where(eq(catalogProducts.status, "published")).orderBy(asc(catalogProducts.sortOrder), desc(catalogProducts.createdAt));
   return rows.map(mapCatalogProduct);
 }
 
+/** Lista todas as peças, incluindo rascunhos, para uso exclusivo do painel administrativo. */
 export async function listAdminCatalog() {
   const db = await ensureStoreBootstrap();
   const rows = await db.select().from(catalogProducts).orderBy(asc(catalogProducts.sortOrder), desc(catalogProducts.createdAt));
   return rows.map(mapCatalogProduct);
 }
 
+/** Cria uma nova peça no catálogo e devolve seu formato preparado para a interface. */
 export async function createCatalogProduct(input: Omit<InsertCatalogProduct, "id" | "createdAt" | "updatedAt">) {
   const db = await ensureStoreBootstrap();
   await db.insert(catalogProducts).values(input);
@@ -106,6 +126,7 @@ export async function createCatalogProduct(input: Omit<InsertCatalogProduct, "id
   return mapCatalogProduct(product[0]);
 }
 
+/** Atualiza apenas os campos informados de uma peça existente. */
 export async function updateCatalogProduct(id: number, input: Partial<Omit<InsertCatalogProduct, "id" | "createdAt" | "updatedAt">>) {
   const db = await ensureStoreBootstrap();
   await db.update(catalogProducts).set(input).where(eq(catalogProducts.id, id));
@@ -114,12 +135,17 @@ export async function updateCatalogProduct(id: number, input: Partial<Omit<Inser
   return mapCatalogProduct(product[0]);
 }
 
+/** Obtém o número persistido que receberá as mensagens iniciadas pela sacola. */
 export async function getWhatsAppPhone() {
   const db = await ensureStoreBootstrap();
   const setting = await db.select().from(storeSettings).where(eq(storeSettings.settingKey, WHATSAPP_SETTING_KEY)).limit(1);
   return setting[0]?.settingValue ?? DEFAULT_WHATSAPP_PHONE;
 }
 
+/**
+ * Valida a seleção da sacola, registra o interesse e cria um snapshot de cada peça.
+ * A transação impede que a solicitação fique parcialmente salva caso algum insert falhe.
+ */
 export async function createCatalogRequest(input: { items: { productId: number; size: string; quantity: number }[] }) {
   const db = await ensureStoreBootstrap();
   const productIds = Array.from(new Set(input.items.map((item) => item.productId)));
@@ -127,6 +153,7 @@ export async function createCatalogRequest(input: { items: { productId: number; 
   if (selectedProducts.length !== productIds.length) throw new Error("Uma ou mais peças não estão disponíveis no catálogo.");
 
   const productsById = new Map(selectedProducts.map((product) => [product.id, product]));
+  // A seleção é reconciliada com o catálogo atual antes de montar a mensagem de atendimento.
   const snapshots = input.items.map((item) => {
     const product = productsById.get(item.productId);
     if (!product || !product.sizes.includes(item.size)) throw new Error("Tamanho indisponível para uma das peças.");
@@ -147,11 +174,13 @@ export async function createCatalogRequest(input: { items: { productId: number; 
   return { reference, whatsappPhone, messageText };
 }
 
+/** Lista as solicitações mais novas primeiro para facilitar o retorno do ateliê. */
 export async function listCatalogRequests() {
   const db = await ensureStoreBootstrap();
   return db.select().from(catalogRequests).orderBy(desc(catalogRequests.createdAt));
 }
 
+/** Atualiza a etapa operacional de uma solicitação registrada no painel administrativo. */
 export async function updateCatalogRequestStatus(reference: string, status: "new" | "contacted" | "archived") {
   const db = await ensureStoreBootstrap();
   await db.update(catalogRequests).set({ status }).where(eq(catalogRequests.reference, reference));

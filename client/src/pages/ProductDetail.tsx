@@ -12,6 +12,7 @@ import { useCart } from "@/contexts/CartContext";
 import { trpc } from "@/lib/trpc";
 
 export default function ProductDetail() {
+  // O slug da rota identifica a peça que deve ser localizada dentro do catálogo persistido.
   const [, params] = useRoute("/produto/:slug");
   const catalogQuery = trpc.catalog.list.useQuery();
   const products = catalogQuery.data ?? [];
@@ -21,10 +22,12 @@ export default function ProductDetail() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const { addItem } = useCart();
 
+  // Quando a peça muda, o tamanho inicial também é reiniciado para a primeira opção disponível.
   useEffect(() => {
     if (product) setSize(product.sizes[0] ?? "P");
   }, [product?.id]);
 
+  // Evita renderizar informações incompletas enquanto a consulta pública ainda está em andamento.
   if (catalogQuery.isLoading) {
     return <div className="bg-[#f4efe7] px-5 py-28 text-center"><p className="eyebrow">Carregando a peça</p><div className="mx-auto mt-5 h-10 w-48 animate-pulse bg-[#dfd2c4]" /></div>;
   }
@@ -33,10 +36,12 @@ export default function ProductDetail() {
     return <div className="bg-[#f4efe7] px-5 py-28 text-center"><p className="display-font text-4xl">Esta peça saiu da arara.</p><Link href="/catalogo" className="btn-dark mt-7">Voltar para a curadoria</Link></div>;
   }
 
+  /** Insere a quantidade escolhida na sacola usando o tamanho atualmente selecionado. */
   const addToBag = () => {
     for (let index = 0; index < quantity; index += 1) addItem(product, size);
     toast.success(`${product.name} foi para a sua sacola.`, { description: `${quantity} unidade${quantity > 1 ? "s" : ""} no tamanho ${size}.` });
   };
+  // Sugestões são retiradas do mesmo catálogo para manter a vitrine coerente com a categoria atual.
   const related = products.filter((item) => item.id !== product.id && item.category === product.category).slice(0, 3);
 
   return (

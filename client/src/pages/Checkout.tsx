@@ -1,6 +1,6 @@
 /**
- * Direção visual: Ateliê de Concreto — checkout reduz a superfície visual, preservando os
- * sinais de marca e guiando a cliente em um formulário claro de uma única coluna.
+ * Rota legada de checkout, mantida apenas como referência visual de uma versão anterior.
+ * A aplicação direciona /checkout para a sacola em App.tsx; o fluxo ativo registra a seleção e abre o WhatsApp.
  */
 import { FormEvent, useState } from "react";
 import { ArrowLeft, CheckCircle2, LockKeyhole } from "lucide-react";
@@ -8,6 +8,7 @@ import { Link, useLocation } from "wouter";
 import { useCart } from "@/contexts/CartContext";
 import { formatBRL } from "@/data/products";
 
+/** Componente desativado de checkout; não deve ser usado para processar pagamento ou endereço. */
 export default function Checkout() {
   const [, setLocation] = useLocation();
   const { items, subtotal, clearCart } = useCart();
@@ -34,6 +35,7 @@ export default function Checkout() {
   );
 }
 
+/** Campo reutilizável da tela legada, preservado para facilitar uma eventual migração futura. */
 function FormField({ label, name, className = "", type = "text", required = false }: { label: string; name: string; className?: string; type?: string; required?: boolean }) {
   return <label className={`block ${className}`}><span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.14em] text-[#241c18]/60">{label}</span><input name={name} type={type} required={required} className="h-12 w-full border border-[#241c18]/20 bg-transparent px-3 text-sm outline-none transition-colors focus:border-[#b84c33]" /></label>;
 }

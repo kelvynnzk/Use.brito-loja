@@ -2,21 +2,32 @@
  * Direção visual: Ateliê de Concreto — detalhe de produto é um provador calmo: imagem ampla,
  * controles táteis de tamanho e uma ação de compra sempre no primeiro campo de visão.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useRoute } from "wouter";
 import { ArrowLeft, Check, ChevronDown, Minus, Plus, Ruler, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
-import { formatBRL, products } from "@/data/products";
+import { formatBRL } from "@/data/products";
 import { ProductCard } from "@/components/ProductCard";
 import { useCart } from "@/contexts/CartContext";
+import { trpc } from "@/lib/trpc";
 
 export default function ProductDetail() {
   const [, params] = useRoute("/produto/:slug");
+  const catalogQuery = trpc.catalog.list.useQuery();
+  const products = catalogQuery.data ?? [];
   const product = products.find((item) => item.slug === params?.slug);
   const [size, setSize] = useState(product?.sizes[0] ?? "P");
   const [quantity, setQuantity] = useState(1);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const { addItem } = useCart();
+
+  useEffect(() => {
+    if (product) setSize(product.sizes[0] ?? "P");
+  }, [product?.id]);
+
+  if (catalogQuery.isLoading) {
+    return <div className="bg-[#f4efe7] px-5 py-28 text-center"><p className="eyebrow">Carregando a peça</p><div className="mx-auto mt-5 h-10 w-48 animate-pulse bg-[#dfd2c4]" /></div>;
+  }
 
   if (!product) {
     return <div className="bg-[#f4efe7] px-5 py-28 text-center"><p className="display-font text-4xl">Esta peça saiu da arara.</p><Link href="/catalogo" className="btn-dark mt-7">Voltar para a curadoria</Link></div>;
@@ -60,7 +71,7 @@ export default function ProductDetail() {
               </div>
               <button onClick={addToBag} className="btn-primary flex h-14 flex-1 justify-center">Adicionar à sacola <ShoppingBag size={17} /></button>
             </div>
-            <p className="mt-4 flex items-center gap-2 text-xs text-[#241c18]/60"><Check size={15} className="text-[#b84c33]" /> Selecione seu tamanho para reservar essa peça na sacola.</p>
+            <p className="mt-4 flex items-center gap-2 text-xs text-[#241c18]/60"><Check size={15} className="text-[#b84c33]" /> Selecione seu tamanho e adicione a peça à sua escolha.</p>
             <div className="mt-9 divide-y divide-[#241c18]/15 border-y border-[#241c18]/15">
               <button onClick={() => setDetailsOpen((open) => !open)} className="flex w-full items-center justify-between py-5 text-left text-xs font-bold uppercase tracking-[0.14em]">Detalhes da peça <ChevronDown size={17} className={`transition-transform ${detailsOpen ? "rotate-180" : ""}`} /></button>
               {detailsOpen && <ul className="space-y-2 pb-5 text-sm leading-6 text-[#241c18]/70">{product.details.map((detail) => <li key={detail}>— {detail}</li>)}</ul>}

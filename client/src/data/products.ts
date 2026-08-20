@@ -2,7 +2,7 @@
  * Direção visual: Ateliê de Concreto — dados de produto sustentam uma curadoria urbana,
  * tátil e editorial, com paleta mineral e linguagem de boutique brasileira.
  */
-export type Category = "vestidos" | "alfaiataria" | "tricôs" | "essenciais" | "acessórios";
+export type Category = "vestidos" | "alfaiataria" | "tricos" | "essenciais" | "acessorios";
 
 export type Product = {
   id: number;
@@ -21,9 +21,9 @@ export type Product = {
 export const categoryLabels: Record<Category, string> = {
   vestidos: "Vestidos",
   alfaiataria: "Alfaiataria",
-  tricôs: "Tricôs",
+  tricos: "Tricôs",
   essenciais: "Essenciais",
-  acessórios: "Acessórios",
+  acessorios: "Acessórios",
 };
 
 export const products: Product[] = [
@@ -57,7 +57,7 @@ export const products: Product[] = [
     id: 3,
     slug: "conjunto-brisa",
     name: "Conjunto Brisa",
-    category: "tricôs",
+    category: "tricos",
     price: 349,
     image: "/manus-storage/use-brito-editorial-knit_54d2459a.jpeg",
     label: "Textura da vez",
@@ -119,7 +119,7 @@ export const products: Product[] = [
     id: 8,
     slug: "brinco-fagulha",
     name: "Brinco Fagulha",
-    category: "acessórios",
+    category: "acessorios",
     price: 119,
     image: "/manus-storage/use-brito-boutique-rail_d21cbd49.jpg",
     color: "Metal queimado",
@@ -144,7 +144,7 @@ export const categories = [
   },
   {
     name: "Tricôs",
-    slug: "tricôs",
+    slug: "tricos",
     image: "/manus-storage/use-brito-editorial-knit_54d2459a.jpeg",
     copy: "Textura para sentir",
   },

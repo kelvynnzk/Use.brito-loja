@@ -10,13 +10,11 @@ import { CartProvider } from "./contexts/CartContext";
 import { SiteShell } from "./components/SiteShell";
 import Cart from "./pages/Cart";
 import Catalog from "./pages/Catalog";
-import Checkout from "./pages/Checkout";
 import Contact from "./pages/Contact";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import ProductDetail from "./pages/ProductDetail";
 import Admin from "./pages/Admin";
-
 function Router() {
   const [isAdmin] = useRoute("/admin");
   if (isAdmin) return <Admin />;
@@ -28,7 +26,7 @@ function Router() {
         <Route path="/catalogo" component={Catalog} />
         <Route path="/produto/:slug" component={ProductDetail} />
         <Route path="/carrinho" component={Cart} />
-        <Route path="/checkout" component={Checkout} />
+        <Route path="/checkout" component={Cart} />
         <Route path="/contato" component={Contact} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />

@@ -11,7 +11,7 @@ const navItems = [
   { label: "Novidades", href: "/catalogo" },
   { label: "Vestidos", href: "/catalogo?categoria=vestidos" },
   { label: "Alfaiataria", href: "/catalogo?categoria=alfaiataria" },
-  { label: "Tricôs", href: "/catalogo?categoria=tricôs" },
+  { label: "Tricôs", href: "/catalogo?categoria=tricos" },
   { label: "Contato", href: "/contato" },
 ];
 

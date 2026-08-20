@@ -5,9 +5,13 @@
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { Link } from "wouter";
 import { ProductCard } from "@/components/ProductCard";
-import { categories, products } from "@/data/products";
+import { categories } from "@/data/products";
+import { trpc } from "@/lib/trpc";
 
 export default function Home() {
+  const catalogQuery = trpc.catalog.list.useQuery();
+  const featuredProducts = catalogQuery.data?.slice(0, 4) ?? [];
+
   return (
     <div className="atelier-page overflow-hidden">
       <section className="relative min-h-[650px] bg-[#d8c9b8] md:min-h-[720px]">
@@ -81,7 +85,8 @@ export default function Home() {
             <Link href="/catalogo" className="hidden text-xs font-bold uppercase tracking-[0.14em] underline underline-offset-4 md:block">Ver todas</Link>
           </div>
           <div className="catalog-grid grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4 md:gap-x-6 md:gap-y-12">
-            {products.slice(0, 4).map((product, index) => <ProductCard product={product} key={product.id} priority={index < 2} />)}
+            {catalogQuery.isLoading && Array.from({ length: 4 }).map((_, index) => <div key={index} className="aspect-[4/5] animate-pulse bg-[#dfd2c4]" />)}
+            {featuredProducts.map((product, index) => <ProductCard product={product} key={product.id} priority={index < 2} />)}
           </div>
         </div>
       </section>

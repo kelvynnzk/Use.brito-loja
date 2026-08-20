@@ -6,7 +6,8 @@ import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import { SlidersHorizontal, X } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
-import { categories, categoryLabels, products, type Category } from "@/data/products";
+import { categories, categoryLabels, type Category } from "@/data/products";
+import { trpc } from "@/lib/trpc";
 
 export default function Catalog() {
   const params = new URLSearchParams(window.location.search);
@@ -15,6 +16,8 @@ export default function Catalog() {
   const [category, setCategory] = useState<Category | "todas">(initialCategory && categoryLabels[initialCategory] ? initialCategory : "todas");
   const [search, setSearch] = useState(initialSearch);
   const [sort, setSort] = useState("destaque");
+  const catalogQuery = trpc.catalog.list.useQuery();
+  const products = catalogQuery.data ?? [];
 
   const filtered = useMemo(() => {
     const needle = search.trim().toLocaleLowerCase("pt-BR");
@@ -26,7 +29,7 @@ export default function Catalog() {
     if (sort === "menor") return [...selection].sort((a, b) => a.price - b.price);
     if (sort === "maior") return [...selection].sort((a, b) => b.price - a.price);
     return selection;
-  }, [category, search, sort]);
+  }, [category, products, search, sort]);
 
   const reset = () => { setCategory("todas"); setSearch(""); setSort("destaque"); };
 
@@ -47,7 +50,7 @@ export default function Catalog() {
             <button className={`filter-link ${category === "todas" ? "is-active" : ""}`} onClick={() => setCategory("todas")}>Tudo</button>
             {categories.map((item) => <button key={item.slug} className={`filter-link ${category === item.slug ? "is-active" : ""}`} onClick={() => setCategory(item.slug as Category)}>{item.name}</button>)}
             <button className={`filter-link ${category === "essenciais" ? "is-active" : ""}`} onClick={() => setCategory("essenciais")}>Essenciais</button>
-            <button className={`filter-link ${category === "acessórios" ? "is-active" : ""}`} onClick={() => setCategory("acessórios")}>Acessórios</button>
+            <button className={`filter-link ${category === "acessorios" ? "is-active" : ""}`} onClick={() => setCategory("acessorios")}>Acessórios</button>
           </div>
           <div className="flex items-center gap-3">
             <label className="sr-only" htmlFor="sort">Ordenar produtos</label>
@@ -71,18 +74,19 @@ export default function Catalog() {
             <div className="relative flex min-h-[340px] flex-col justify-between p-7 md:p-10"><img src="/manus-storage/use-brito-mark_b2bb36b9.png" alt="" className="absolute right-7 top-7 h-11 w-11 opacity-25" /><p className="eyebrow">Peça em foco</p><div><p className="text-sm text-[#241c18]/60">Uma ideia de combinação para começar a sua própria sequência.</p><h2 className="display-font mt-3 text-4xl leading-[.96] tracking-[-0.04em] md:text-5xl">Formas que pedem uma segunda olhada.</h2><Link href="/produto/blazer-selva" className="btn-dark mt-7">Ver Blazer Selva</Link></div></div>
           </section>
         )}
-        <p className="mb-7 text-[10px] font-bold uppercase tracking-[0.16em] text-[#241c18]/55">{filtered.length} {filtered.length === 1 ? "peça encontrada" : "peças encontradas"}</p>
-        {filtered.length > 0 ? (
+        <p className="mb-7 text-[10px] font-bold uppercase tracking-[0.16em] text-[#241c18]/55">{catalogQuery.isLoading ? "Carregando curadoria" : `${filtered.length} ${filtered.length === 1 ? "peça encontrada" : "peças encontradas"}`}</p>
+        {catalogQuery.isLoading && <div className="catalog-grid grid grid-cols-2 gap-x-4 gap-y-11 md:grid-cols-4 md:gap-x-6 md:gap-y-14">{Array.from({ length: 8 }).map((_, index) => <div key={index} className="aspect-[4/5] animate-pulse bg-[#dfd2c4]" />)}</div>}
+        {!catalogQuery.isLoading && filtered.length > 0 ? (
           <div className="catalog-grid grid grid-cols-2 gap-x-4 gap-y-11 md:grid-cols-4 md:gap-x-6 md:gap-y-14">
             {filtered.map((product, index) => <ProductCard key={product.id} product={product} priority={index < 2} />)}
           </div>
-        ) : (
+        ) : !catalogQuery.isLoading ? (
           <div className="border border-dashed border-[#241c18]/25 px-5 py-20 text-center">
             <p className="display-font text-3xl">Ainda não encontramos esse recorte.</p>
             <p className="mx-auto mt-3 max-w-sm text-sm text-[#241c18]/65">Tente uma busca mais ampla ou volte para todas as peças da curadoria.</p>
             <button onClick={reset} className="btn-dark mt-7">Ver tudo</button>
           </div>
-        )}
+        ) : null}
         <div className="mt-16 border-t border-[#241c18]/15 pt-8 text-center">
           <p className="text-sm text-[#241c18]/65">Não encontrou o que imaginou?</p>
           <Link href="/contato" className="mt-2 inline-block text-xs font-bold uppercase tracking-[0.14em] underline underline-offset-4">Fale com o ateliê</Link>

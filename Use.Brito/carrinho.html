@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sua sacola de compras Use Brito.">
+    <title>Sacola | Use Brito</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body class="cart-page">
+    <div class="announcement">Frete grátis nas compras acima de R$ 299 <span>•</span> Parcele em até 6x sem juros</div>
+
+    <header class="site-header">
+        <a class="brand" href="index.html" aria-label="Use Brito, início">USE <strong>BRITO</strong></a>
+        <nav class="main-nav" aria-label="Navegação principal">
+            <a href="index.html#novidades">Novidades</a>
+            <a href="index.html#colecao">Coleção</a>
+            <a href="index.html#mais-vendidos">Mais vendidos</a>
+            <a href="index.html#sobre">A marca</a>
+        </nav>
+        <div class="header-actions">
+            <button class="icon-button" aria-label="Buscar produtos">⌕</button>
+            <button class="icon-button" aria-label="Minha conta">♙</button>
+            <a class="bag-button" href="carrinho.html" aria-label="Sacola de compras">Sacola <span>1</span></a>
+        </div>
+    </header>
+
+    <main class="cart-main">
+        <div class="cart-title-row">
+            <div>
+                <p class="eyebrow">Sua seleção</p>
+                <h1>Sua <em>sacola.</em></h1>
+            </div>
+            <p class="cart-count" id="cart-count">01 produto</p>
+        </div>
+
+        <div class="cart-layout">
+            <section class="cart-items" aria-label="Produtos da sacola">
+                <article class="cart-item" data-id="aurora" data-price="289">
+                    <div class="cart-product-image"><img
+                            src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=500&q=85"
+                            alt="Camisa Aurora off-white"></div>
+                    <div class="cart-product-details">
+                        <div class="cart-product-heading">
+                            <div>
+                                <p class="cart-label">Camisas</p>
+                                <h2>Camisa Aurora</h2>
+                                <p class="cart-description">Linho natural / Off-white</p>
+                            </div><strong class="item-price">R$ 289</strong>
+                        </div>
+                        <div class="cart-item-controls"><label for="size">Tamanho <select id="size">
+                                    <option>P</option>
+                                    <option>M</option>
+                                    <option>G</option>
+                                </select></label><label for="quantity">Quantidade <input class="quantity-input"
+                                    id="quantity" type="number" value="1" min="1"></label><button class="remove-button"
+                                type="button">Remover</button></div>
+                    </div>
+                </article>
+                <a class="continue-shopping" href="index.html#colecao">← Continuar comprando</a>
+            </section>
+
+            <aside class="order-summary">
+                <h2>Resumo do pedido</h2>
+                <div class="summary-line"><span>Subtotal</span><strong id="subtotal">R$ 289</strong></div>
+                <div class="summary-line"><span>Entrega</span><span class="free-shipping">Grátis</span></div>
+                <div class="coupon-field"><label for="coupon">Tem um cupom?</label>
+                    <div><input id="coupon" type="text" placeholder="Digite o código"><button
+                            type="button">Aplicar</button></div>
+                </div>
+                <div class="summary-total"><span>Total</span><strong id="total">R$ 289</strong></div>
+                <button class="checkout-button" type="button">Ir para o pagamento <span>↗</span></button>
+                <p class="secure-checkout">Pagamento seguro e protegido</p>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <a class="brand" href="index.html">USE <strong>BRITO</strong></a>
+        <p>Moda para todos os seus dias.</p>
+        <div class="footer-links"><a href="index.html#sobre">Instagram</a><a href="index.html#sobre">Contato</a><a
+                href="index.html#sobre">Trocas e devoluções</a></div>
+        <small>© 2024 Use Brito</small>
+    </footer>
+    <script src="js/carrinho.js"></script>
+</body>
+
+</html>
